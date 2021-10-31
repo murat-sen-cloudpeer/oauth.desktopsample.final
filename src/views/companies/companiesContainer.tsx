@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
+import {Company} from '../../api/entities/company';
 import {ErrorCodes} from '../../plumbing/errors/errorCodes';
-import {ErrorHandler} from '../../plumbing/errors/errorHandler';
+import {UIError} from '../../plumbing/errors/uiError';
 import {EventNames} from '../../plumbing/events/eventNames';
 import {NavigateEvent} from '../../plumbing/events/navigateEvent';
 import {ReloadMainViewEvent} from '../../plumbing/events/reloadMainViewEvent';
 import {ErrorSummaryView} from '../errors/errorSummaryView';
-import {ApiViewNames} from '../utilities/apiViewNames';
 import {CompaniesContainerProps} from './companiesContainerProps';
 import {CompaniesContainerState} from './companiesContainerState';
 import {CompaniesView} from './companiesView';
@@ -60,18 +60,7 @@ export function CompaniesContainer(props: CompaniesContainerProps): JSX.Element 
      */
     async function loadData(causeError: boolean): Promise<void> {
 
-        try {
-            setState((s) => {
-                return {
-                    ...s,
-                    error: null,
-                };
-            });
-
-            model.apiViewEvents.onViewLoading(ApiViewNames.Main);
-            const companies = await model.apiClient.getCompanyList({causeError});
-            model.apiViewEvents.onViewLoaded(ApiViewNames.Main);
-
+        const onSuccess = (companies: Company[]) => {
             setState((s) => {
                 return {
                     ...s,
@@ -79,10 +68,9 @@ export function CompaniesContainer(props: CompaniesContainerProps): JSX.Element 
                     error: null,
                 };
             });
+        };
 
-        } catch (e) {
-
-            const error = ErrorHandler.getFromException(e);
+        const onError = (error: UIError) => {
             setState((s) => {
                 return {
                     ...s,
@@ -90,8 +78,9 @@ export function CompaniesContainer(props: CompaniesContainerProps): JSX.Element 
                     error,
                 };
             });
-            model.apiViewEvents.onViewLoadFailed(ApiViewNames.Main, error);
-        }
+        };
+
+        model.callApi(onSuccess, onError, causeError);
     }
 
     /*
@@ -131,11 +120,12 @@ export function CompaniesContainer(props: CompaniesContainerProps): JSX.Element 
         );
     }
 
-    // Display the data via a child view
+    // Render the view
     const childProps = {
         companies: state.companies,
     };
     return  (
         <CompaniesView {...childProps}/>
     );
+
 }
