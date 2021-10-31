@@ -99,7 +99,7 @@ export function UserInfoView(props: UserInfoViewProps): JSX.Element {
 
         const options = {
             reload,
-            isInLoggedOutView: RouteHelper.isInLoginRequiredView(),
+            isInMainView: RouteHelper.isInMainView(),
             causeError,
         };
 
