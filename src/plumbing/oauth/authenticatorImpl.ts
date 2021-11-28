@@ -174,7 +174,7 @@ export class AuthenticatorImpl implements Authenticator {
     public async expireAccessToken(): Promise<void> {
 
         if (this._tokens && this._tokens.accessToken) {
-            this._tokens.accessToken = 'x' + this._tokens.accessToken + 'x';
+            this._tokens.accessToken = `${this._tokens.accessToken}x`;
             await this._events.saveTokens(this._tokens);
         }
     }
@@ -186,7 +186,7 @@ export class AuthenticatorImpl implements Authenticator {
     public async expireRefreshToken(): Promise<void> {
 
         if (this._tokens && this._tokens.refreshToken) {
-            this._tokens.refreshToken = 'x' + this._tokens.refreshToken + 'x';
+            this._tokens.refreshToken = `${this._tokens.refreshToken}x`
             this._tokens.accessToken = null;
             await this._events.saveTokens(this._tokens);
         }
